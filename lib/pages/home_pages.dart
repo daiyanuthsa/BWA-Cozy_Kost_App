@@ -1,3 +1,4 @@
+import 'package:bwa_cozy_kost/providers/space_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bwa_cozy_kost/models/city.dart';
 import 'package:bwa_cozy_kost/models/space.dart';
@@ -7,18 +8,22 @@ import 'package:bwa_cozy_kost/widgets/bottom_navbar_item.dart';
 import 'package:bwa_cozy_kost/widgets/city_card.dart';
 import 'package:bwa_cozy_kost/widgets/space_card.dart';
 import 'package:bwa_cozy_kost/widgets/tips_card.dart';
-import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+  
 
   @override
   Widget build(BuildContext context) {
+    var spaceProvider = Provider.of<SpaceProvider>(context);
+
     return Scaffold(
       backgroundColor: white,
       body: SafeArea(
           child: ListView(
-        children:  [
+        children: [
           const SizedBox(
             height: 24,
           ),
@@ -131,45 +136,35 @@ class HomePage extends StatelessWidget {
             height: 16,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                SpaceCard(Space(
-                    id: 1,
-                    name: 'Kuretakeso Hott',
-                    imageUrl: 'assets/space1.png',
-                    price: 52,
-                    city: 'city',
-                    country: 'Indonesia',
-                    rating: 4)),
-                const SizedBox(
-                  height: 30,
-                ),
-                SpaceCard(Space(
-                    id: 2,
-                    name: 'Roemah Nenek',
-                    imageUrl: 'assets/space2.png',
-                    price: 11,
-                    city: 'Seattle, Bogor',
-                    country: 'Indonesia',
-                    rating: 5)),
-                const SizedBox(
-                  height: 30,
-                ),
-                SpaceCard(Space(
-                    id: 3,
-                    name: 'Kuretakeso Hott',
-                    imageUrl: 'assets/space3.png',
-                    price: 20,
-                    city: 'city',
-                    country: 'Indonesia',
-                    rating: 3)),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
-            ),
-          ),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: 
+              
+              FutureBuilder(
+                future: spaceProvider.getRecomendedSpaces(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<Space> data = (snapshot.data as List<Space>?) ?? [];
+                    int index = -1;
+                    return Column(
+                      children: data.map((item){
+                        index++;
+                        return Container(
+                          margin: EdgeInsets.only(top: index==0 ? 0 : 30 ),
+                          child: SpaceCard(item),
+                        );
+                      } ).toList(),
+
+                    );
+
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                },
+              )
+              ),
           const SizedBox(
             height: 16,
           ),
