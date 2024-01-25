@@ -13,8 +13,6 @@ import 'package:provider/provider.dart';
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  
-
   @override
   Widget build(BuildContext context) {
     var spaceProvider = Provider.of<SpaceProvider>(context);
@@ -137,34 +135,28 @@ class HomePage extends StatelessWidget {
           ),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: 
-              
-              FutureBuilder(
+              child: FutureBuilder(
                 future: spaceProvider.getRecomendedSpaces(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List<Space> data = (snapshot.data as List<Space>?) ?? [];
                     int index = -1;
                     return Column(
-                      children: data.map((item){
+                      children: data.map((item) {
                         index++;
                         return Container(
-                          margin: EdgeInsets.only(top: index==0 ? 0 : 30 ),
+                          margin: EdgeInsets.only(top: index == 0 ? 0 : 30),
                           child: SpaceCard(item),
                         );
-                      } ).toList(),
-
+                      }).toList(),
                     );
-
                   } else {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-
                 },
-              )
-              ),
+              )),
           const SizedBox(
             height: 16,
           ),
@@ -207,6 +199,34 @@ class HomePage extends StatelessWidget {
           ),
         ],
       )),
+      floatingActionButton: Container(
+        height: 65,
+        width: 327,
+        decoration: BoxDecoration(
+            color: const Color(0xffF6F7F8), borderRadius: BorderRadius.circular(23)),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            BottomNavbarItem(
+              imageurl: 'assets/icon_home1.png',
+              isActive: true,
+            ),
+            BottomNavbarItem(
+              imageurl: 'assets/icon_mail.png',
+              isActive: false,
+            ),
+            BottomNavbarItem(
+              imageurl: 'assets/icon_card.png',
+              isActive: false,
+            ),
+            BottomNavbarItem(
+              imageurl: 'assets/icon_love.png',
+              isActive: false,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

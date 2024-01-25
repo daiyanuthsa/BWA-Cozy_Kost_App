@@ -1,18 +1,25 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:bwa_cozy_kost/models/space.dart';
 import 'package:bwa_cozy_kost/pages/error_page.dart';
 import 'package:bwa_cozy_kost/pages/home_pages.dart';
 import 'package:bwa_cozy_kost/theme.dart';
 import 'package:bwa_cozy_kost/widgets/facility_item.dart';
+import 'package:bwa_cozy_kost/widgets/rating_item.dart';
 import 'package:flutter/material.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatelessWidget {
+  final Space space;
+
+  DetailPage(this.space);
+
   @override
   Widget build(BuildContext context) {
-    launchUrl(String url) async {
-      if (await launchUrl(url)) {
-        launchUrl(url);
+    Future<void> actionUrl(String url, BuildContext context) async {
+      Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
       } else {
         Navigator.push(
           context,
@@ -28,8 +35,8 @@ class DetailPage extends StatelessWidget {
       bottom: false,
       child: Stack(
         children: [
-          Image.asset(
-            'assets/space1_detail.png',
+          Image.network(
+            space.imageUrl,
             width: MediaQuery.of(context).size.width,
             height: 350,
             fit: BoxFit.cover,
@@ -65,7 +72,7 @@ class DetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Kuretakeso Hott',
+                                space.name,
                                 style: blacktittleStyle.copyWith(
                                   fontSize: 22,
                                 ),
@@ -74,7 +81,7 @@ class DetailPage extends StatelessWidget {
                                 height: 2,
                               ),
                               Text.rich(TextSpan(
-                                  text: '\$52',
+                                  text: '\$${space.price}',
                                   style: purppleTextStyle.copyWith(
                                     fontSize: 16,
                                   ),
@@ -89,39 +96,23 @@ class DetailPage extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              Image.asset(
-                                'assets/star.png',
-                                width: 20,
-                              ),
+                              RatingItem(index: 1, rating: space.rating),
                               SizedBox(
                                 width: 2,
                               ),
-                              Image.asset(
-                                'assets/star.png',
-                                width: 20,
-                              ),
+                              RatingItem(index: 2, rating: space.rating),
                               SizedBox(
                                 width: 2,
                               ),
-                              Image.asset(
-                                'assets/star.png',
-                                width: 20,
-                              ),
+                              RatingItem(index: 3, rating: space.rating),
                               SizedBox(
                                 width: 2,
                               ),
-                              Image.asset(
-                                'assets/star.png',
-                                width: 20,
-                              ),
+                              RatingItem(index: 4, rating: space.rating),
                               SizedBox(
                                 width: 2,
                               ),
-                              Image.asset(
-                                'assets/star.png',
-                                width: 20,
-                                color: Color(0xff989BA1),
-                              ),
+                              RatingItem(index: 5, rating: space.rating),
                             ],
                           )
                         ],
@@ -152,17 +143,17 @@ class DetailPage extends StatelessWidget {
                           FacilityItem(
                             name: 'kitchen',
                             imageUrl: 'assets/facilities_bar.png',
-                            total: 2,
+                            total: space.numberOfKitchens,
                           ),
                           FacilityItem(
                             name: 'bedroom',
                             imageUrl: 'assets/facilities_bed.png',
-                            total: 3,
+                            total: space.numberOfBedrooms,
                           ),
                           FacilityItem(
                             name: ' Big Lemari',
                             imageUrl: 'assets/facilities_cupboard.png',
-                            total: 3,
+                            total: space.numberOfCupboards,
                           ),
                         ],
                       ),
@@ -186,46 +177,23 @@ class DetailPage extends StatelessWidget {
                     SizedBox(
                       height: 88,
                       child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          SizedBox(
-                            width: 24,
-                          ),
-                          Image.asset(
-                            'assets/photos1.png',
-                            height: 88,
-                            width: 110,
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(
-                            width: 18,
-                          ),
-                          Image.asset(
-                            'assets/photos2.png',
-                            height: 88,
-                            width: 110,
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(
-                            width: 18,
-                          ),
-                          Image.asset(
-                            'assets/photos3.png',
-                            height: 88,
-                            width: 110,
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(
-                            width: 18,
-                          ),
-                          Image.asset(
-                            'assets/photos4.png',
-                            height: 88,
-                            width: 110,
-                            fit: BoxFit.cover,
-                          )
-                        ],
-                      ),
+                          scrollDirection: Axis.horizontal,
+                          children: space.photos.map((item) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                left: 24,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.network(
+                                  item,
+                                  height: 88,
+                                  width: 110,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          }).toList()),
                     ),
                     SizedBox(
                       height: 30,
@@ -251,15 +219,15 @@ class DetailPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Jln. Kappan Sukses No. 20\nPalembang',
+                            '${space.address}\n${space.city}, ${space.country}',
                             style: greyTextStyle.copyWith(
                               fontSize: 14,
                             ),
                           ),
                           InkWell(
                             onTap: () {
-                              launchUrl(
-                                  'https://goo.gl/maps/eFFkMm2XGydmW37R6');
+                              print("Button tapped");
+                              actionUrl(space.mapUrl, context);
                             },
                             child: Image.asset(
                               'assets/btn_loc.png',
@@ -278,7 +246,7 @@ class DetailPage extends StatelessWidget {
                       width: MediaQuery.of(context).size.width,
                       child: ElevatedButton(
                         onPressed: () {
-                          launchUrl('tel:+6281285942400');
+                          actionUrl('tel:+${space.phone}', context);
                         },
                         style: ButtonStyle(
                             backgroundColor:
